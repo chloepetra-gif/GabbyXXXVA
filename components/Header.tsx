@@ -10,12 +10,16 @@ const NavLink: React.FC<{
   page: Page;
   currentPage: Page;
   onNavigate: (page: Page) => void;
+  onCloseMenu?: () => void;
   children: React.ReactNode;
-}> = ({ page, currentPage, onNavigate, children }) => {
+}> = ({ page, currentPage, onNavigate, onCloseMenu, children }) => {
   const isActive = currentPage === page;
   return (
     <button
-      onClick={() => onNavigate(page)}
+      onClick={() => {
+        onNavigate(page);
+        onCloseMenu?.();
+      }}
       className={`relative font-semibold px-4 py-2 rounded-md transition-colors duration-300 text-lg ${
         isActive
           ? 'text-pink-400'
@@ -32,6 +36,7 @@ const NavLink: React.FC<{
 
 const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate }) => {
   const [isLive, setIsLive] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -58,20 +63,23 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate }) => {
             </span>
           )}
         </div>
-        <nav className="hidden md:flex items-center space-x-4">
-          <NavLink page={Page.Home} currentPage={currentPage} onNavigate={onNavigate}>
-            Home
-          </NavLink>
-          <NavLink page={Page.Gallery} currentPage={currentPage} onNavigate={onNavigate}>
-            Gallery
-          </NavLink>
-           <NavLink page={Page.InteractiveRoom} currentPage={currentPage} onNavigate={onNavigate}>
-            Interactive Room
-          </NavLink>
-          <NavLink page={Page.Premium} currentPage={currentPage} onNavigate={onNavigate}>
-            Premium Content
-          </NavLink>
-        </nav>
+        <div className="flex items-center">
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden text-white text-2xl mr-4">☰</button>
+          <nav className={`${isMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4 absolute md:relative top-full left-0 right-0 md:top-auto md:left-auto md:right-auto bg-black md:bg-transparent p-4 md:p-0 z-30`}>
+            <NavLink page={Page.Home} currentPage={currentPage} onNavigate={onNavigate} onCloseMenu={() => setIsMenuOpen(false)}>
+              Home
+            </NavLink>
+            <NavLink page={Page.Gallery} currentPage={currentPage} onNavigate={onNavigate} onCloseMenu={() => setIsMenuOpen(false)}>
+              Gallery
+            </NavLink>
+            <NavLink page={Page.InteractiveRoom} currentPage={currentPage} onNavigate={onNavigate} onCloseMenu={() => setIsMenuOpen(false)}>
+              Interactive Room
+            </NavLink>
+            <NavLink page={Page.Premium} currentPage={currentPage} onNavigate={onNavigate} onCloseMenu={() => setIsMenuOpen(false)}>
+              Premium Content
+            </NavLink>
+          </nav>
+        </div>
       </div>
     </header>
   );
